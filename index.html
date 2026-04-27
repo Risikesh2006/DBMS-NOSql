@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QueryQuest — NoSQL Classroom Arena</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ════════════════════ AMBIENT BACKGROUND ════════════════════ -->
+<div class="bg-grid"></div>
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
+<!-- ════════════════════ HUD BAR ════════════════════ -->
+<header class="hud-bar">
+  <div class="hud-logo">
+    <span class="logo-icon">⬡</span>
+    <span class="logo-text">QueryQuest</span>
+    <span class="logo-sub">NoSQL Arena</span>
+  </div>
+  <div class="hud-stats">
+    <div class="stat-pill">
+      <span class="stat-label">SCORE</span>
+      <span class="stat-value" id="scoreDisplay">0</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">QUESTION</span>
+      <span class="stat-value" id="questionCounter">0 / 8</span>
+    </div>
+    <div class="stat-pill timer-pill" id="timerPill" style="display:none">
+      <span class="stat-label">TIME</span>
+      <span class="stat-value" id="timerDisplay">30</span>
+    </div>
+    <button class="btn-reset" id="resetBtn">↺ Reset</button>
+  </div>
+</header>
+
+<!-- ════════════════════ SCREEN: SPINNER ════════════════════ -->
+<section class="screen" id="spinnerScreen">
+  <div class="spinner-layout">
+
+    <div class="spinner-left">
+      <div class="screen-eyebrow">ROUND SELECTOR</div>
+      <h1 class="screen-title">Who's Up<br/><em>Next?</em></h1>
+      <p class="screen-sub">Spin the wheel — fate decides the challenger</p>
+
+      <div class="student-reel-wrap">
+        <div class="reel-mask">
+          <div class="student-reel" id="studentReel">
+            <!-- filled by JS -->
+          </div>
+        </div>
+        <div class="reel-pointer"></div>
+      </div>
+
+      <div class="selected-badge" id="selectedBadge" style="opacity:0">
+        <span class="badge-avatar" id="badgeAvatar">🎓</span>
+        <div>
+          <div class="badge-label">CHALLENGER SELECTED</div>
+          <div class="badge-name" id="badgeName">—</div>
+        </div>
+      </div>
+
+      <div class="spinner-actions">
+        <button class="btn-spin" id="spinBtn">
+          <span class="btn-spin-icon">◈</span>
+          <span>Spin</span>
+        </button>
+        <button class="btn-start" id="startBtn" disabled>
+          Start Question →
+        </button>
+      </div>
+    </div>
+
+    <div class="spinner-right">
+      <div class="wheel-container">
+        <canvas id="wheelCanvas" width="380" height="380"></canvas>
+        <div class="wheel-center-hub">
+          <span class="wheel-hub-icon">⬡</span>
+        </div>
+      </div>
+      <div class="wheel-pointer-outer">▼</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════ SCREEN: QUIZ ════════════════════ -->
+<section class="screen hidden" id="quizScreen">
+  <div class="quiz-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="quiz-left">
+      <div class="quiz-header">
+        <div class="challenger-tag">
+          <span class="challenger-avatar" id="challengerAvatar">🎓</span>
+          <div>
+            <div class="challenger-sub">CHALLENGER</div>
+            <div class="challenger-name" id="challengerName">—</div>
+          </div>
+        </div>
+        <div class="db-badge" id="dbBadge">
+          <span id="dbIcon">📄</span>
+          <span id="dbType">Document</span>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="question-eyebrow">MISSION BRIEFING</div>
+        <p class="question-text" id="questionText">Loading...</p>
+      </div>
+
+      <div class="data-panel">
+        <div class="data-panel-label">
+          <span class="data-panel-dot"></span>
+          CURRENT DATA STATE
+        </div>
+        <div class="data-content" id="dataContent">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="quiz-right">
+
+      <div class="options-panel">
+        <div class="options-label">SELECT COMMAND</div>
+        <div class="options-grid" id="optionsGrid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <div class="terminal-panel">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="t-dot red"></span>
+            <span class="t-dot yellow"></span>
+            <span class="t-dot green"></span>
+          </div>
+          <span class="terminal-title">nosql@queryquest ~ terminal</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+          <div class="terminal-line dim">
+            <span class="prompt">$</span> Awaiting command selection...
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-footer">
+        <div class="result-badge hidden" id="resultBadge"></div>
+        <button class="btn-next hidden" id="nextBtn">Next Round →</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ SCREEN: GAME OVER ════════════════════ -->
+<section class="screen hidden" id="endScreen">
+  <div class="end-layout">
+    <div class="end-glow"></div>
+    <div class="end-eyebrow">GAME COMPLETE</div>
+    <div class="end-score-wrap">
+      <div class="end-score-label">FINAL SCORE</div>
+      <div class="end-score" id="finalScore">0</div>
+      <div class="end-score-max" id="endScoreMax">/ 18</div>
+    </div>
+    <div class="end-grade" id="endGrade">—</div>
+    <div class="end-message" id="endMessage">—</div>
+    <button class="btn-playagain" id="playAgainBtn">↺ Play Again</button>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
