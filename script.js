@@ -20,395 +20,96 @@ const DB_ICONS = {
 };
 
 const QUESTIONS = [
-  // ── Document (MongoDB) ──
   {
-    type: 'Document',
-    text: 'You need to insert a new product document into the "products" collection. The product is a "Wireless Keyboard" with a price of 49.99 and stock of 150 units. Which command is correct?',
-    data: { kind: 'json', label: 'products collection', docs: [
-      { _id: 'p001', name: 'USB Mouse', price: 19.99, stock: 300 },
-      { _id: 'p002', name: 'HDMI Cable', price: 9.99, stock: 500 },
-    ]},
+    type: "Document",
+    question: "Insert a new user",
     options: [
-      'db.products.insertOne({ name: "Wireless Keyboard", price: 49.99, stock: 150 })',
-      'db.products.addDocument({ name: "Wireless Keyboard", price: 49.99, stock: 150 })',
-      'db.products.push({ name: "Wireless Keyboard", price: 49.99 })',
-      'db.insert("products", { name: "Wireless Keyboard" })',
-    ],
-    correct: 0,
-    terminalCmd: 'db.products.insertOne({ name: "Wireless Keyboard", price: 49.99, stock: 150 })',
-    terminalSuccess: '{ acknowledged: true, insertedId: ObjectId("64a2b...") }',
-    terminalError: 'TypeError: db.products.addDocument is not a function',
+      { text: 'insertOne({name:"Ravi"})', correct: true },
+      { text: 'deleteOne({name:"Ravi"})', correct: false },
+      { text: 'updateOne({})', correct: false }
+    ]
   },
   {
-    type: 'Document',
-    text: 'Update the price of the USB Mouse (id: "p001") from 19.99 to 24.99. The stock should remain unchanged. Which command performs this correctly?',
-    data: { kind: 'json', label: 'products collection', docs: [
-      { _id: 'p001', name: 'USB Mouse', price: 19.99, stock: 300 },
-      { _id: 'p002', name: 'HDMI Cable', price: 9.99, stock: 500 },
-    ]},
+    type: "Document",
+    question: "Update user's age",
     options: [
-      'db.products.update({ _id: "p001" }, { price: 24.99 })',
-      'db.products.updateOne({ _id: "p001" }, { $set: { price: 24.99 } })',
-      'db.products.edit({ _id: "p001" }, { price: 24.99 })',
-      'db.products.modify("p001", "price", 24.99)',
-    ],
-    correct: 1,
-    terminalCmd: 'db.products.updateOne({ _id: "p001" }, { $set: { price: 24.99 } })',
-    terminalSuccess: '{ acknowledged: true, matchedCount: 1, modifiedCount: 1 }',
-    terminalError: 'SyntaxError: $set operator expected but got plain object',
+      { text: 'updateOne({name:"Ravi"}, {$set:{age:22}})', correct: true },
+      { text: 'insertOne({age:22})', correct: false },
+      { text: 'deleteOne({age:22})', correct: false }
+    ]
   },
   {
-    type: 'Document',
-    text: 'Delete all documents in the "logs" collection where the status field equals "expired". Which command accomplishes this?',
-    data: { kind: 'json', label: 'logs collection', docs: [
-      { _id: 'l001', event: 'login', status: 'active' },
-      { _id: 'l002', event: 'logout', status: 'expired' },
-      { _id: 'l003', event: 'purchase', status: 'expired' },
-    ]},
+    type: "Document",
+    question: "Delete a user",
     options: [
-      'db.logs.remove({ status: "expired" })',
-      'db.logs.deleteMany({ status: "expired" })',
-      'db.logs.drop({ status: "expired" })',
-      'db.logs.erase({ status: "expired" })',
-    ],
-    correct: 1,
-    terminalCmd: 'db.logs.deleteMany({ status: "expired" })',
-    terminalSuccess: '{ acknowledged: true, deletedCount: 2 }',
-    terminalError: 'TypeError: db.logs.erase is not a function',
-  },
-
-  // ── Key-Value (Redis) ──
-  {
-    type: 'Key-Value',
-    text: 'Set a key "session:user42" with the value "authenticated" in Redis, and make it expire automatically after 3600 seconds. Which command is correct?',
-    data: { kind: 'kv', pairs: [
-      { key: 'session:user10', val: 'authenticated' },
-      { key: 'session:user31', val: 'guest' },
-      { key: 'cache:home',     val: '<html>...</html>' },
-    ]},
-    options: [
-      'SET session:user42 "authenticated" EXPIRE 3600',
-      'SET session:user42 "authenticated" EX 3600',
-      'INSERT session:user42 "authenticated" TTL 3600',
-      'PUT session:user42 "authenticated" TIMEOUT 3600',
-    ],
-    correct: 1,
-    terminalCmd: 'SET session:user42 "authenticated" EX 3600',
-    terminalSuccess: 'OK',
-    terminalError: 'ERR syntax error near "EXPIRE"',
+      { text: 'deleteOne({name:"Ravi"})', correct: true },
+      { text: 'insertOne({name:"Ravi"})', correct: false },
+      { text: 'updateOne({})', correct: false }
+    ]
   },
   {
-    type: 'Key-Value',
-    text: 'Delete the key "cache:home" from the Redis store to force a cache refresh. Which command does this?',
-    data: { kind: 'kv', pairs: [
-      { key: 'session:user10', val: 'authenticated' },
-      { key: 'cache:home',     val: '<html>...</html>' },
-      { key: 'cache:about',    val: '<html>...</html>' },
-    ]},
+    type: "Key-Value",
+    question: "Add a key-value pair",
     options: [
-      'REMOVE cache:home',
-      'DEL cache:home',
-      'UNSET cache:home',
-      'DROP KEY cache:home',
-    ],
-    correct: 1,
-    terminalCmd: 'DEL cache:home',
-    terminalSuccess: '(integer) 1',
-    terminalError: 'ERR unknown command "REMOVE"',
-  },
-
-  // ── Column (Cassandra) ──
-  {
-    type: 'Column',
-    text: 'Insert a new row for user "alice" into the "users" table in the "ks_app" keyspace. Include email and age values. Which CQL command is correct?',
-    data: { kind: 'table', headers: ['user_id','email','age','country'], rows: [
-      ['bob',   'bob@mail.com',   28, 'US'],
-      ['carol', 'carol@mail.com', 34, 'UK'],
-    ]},
-    options: [
-      'INSERT INTO ks_app.users (user_id, email, age) VALUES (\'alice\', \'alice@mail.com\', 25)',
-      'db.ks_app.users.insertOne({ user_id: "alice", email: "alice@mail.com", age: 25 })',
-      'ADD ROW ks_app.users (user_id=\'alice\', email=\'alice@mail.com\')',
-      'PUT ks_app.users WHERE user_id=\'alice\'',
-    ],
-    correct: 0,
-    terminalCmd: "INSERT INTO ks_app.users (user_id, email, age) VALUES ('alice', 'alice@mail.com', 25)",
-    terminalSuccess: '[applied] true  (1 row)',
-    terminalError: 'SyntaxError: Invalid CQL near "db.ks_app"',
+      { text: 'SET user1 "Ravi"', correct: true },
+      { text: 'GET user1', correct: false },
+      { text: 'DEL user1', correct: false }
+    ]
   },
   {
-    type: 'Column',
-    text: 'Update the country field to "CA" for user "bob" in the Cassandra "users" table. Which command is correct?',
-    data: { kind: 'table', headers: ['user_id','email','age','country'], rows: [
-      ['bob',   'bob@mail.com',   28, 'US'],
-      ['carol', 'carol@mail.com', 34, 'UK'],
-      ['alice', 'alice@mail.com', 25, null ],
-    ]},
+    type: "Key-Value",
+    question: "Update value of a key",
     options: [
-      "UPDATE ks_app.users SET country = 'CA' WHERE user_id = 'bob'",
-      "MODIFY ks_app.users SET country='CA' FOR user_id='bob'",
-      "db.users.update({ user_id:'bob'}, { $set: { country:'CA' }})",
-      "ALTER ROW ks_app.users country='CA' WHERE id='bob'",
-    ],
-    correct: 0,
-    terminalCmd: "UPDATE ks_app.users SET country = 'CA' WHERE user_id = 'bob'",
-    terminalSuccess: '[applied] true  (1 row)',
-    terminalError: "SyntaxError: Invalid CQL near 'MODIFY'",
-  },
-
-  // ── Graph (Neo4j) ──
-  {
-    type: 'Graph',
-    text: 'Create a new node for a Person named "David" and link him to the existing "TechCorp" company node with a WORKS_AT relationship. Which Cypher command is correct?',
-    data: { kind: 'graph', edges: [
-      { from: 'Alice',   rel: 'WORKS_AT', to: 'TechCorp' },
-      { from: 'Bob',     rel: 'WORKS_AT', to: 'TechCorp' },
-      { from: 'Alice',   rel: 'KNOWS',    to: 'Bob'      },
-    ]},
-    options: [
-      'MATCH (c:Company {name:"TechCorp"}) CREATE (p:Person {name:"David"})-[:WORKS_AT]->(c)',
-      'INSERT (:Person {name:"David"})-[:WORKS_AT]->(:Company {name:"TechCorp"})',
-      'ADD NODE Person("David") RELATE TechCorp WORKS_AT',
-      'db.graph.addNode("David").linkTo("TechCorp","WORKS_AT")',
-    ],
-    correct: 0,
-    terminalCmd: 'MATCH (c:Company {name:"TechCorp"}) CREATE (p:Person {name:"David"})-[:WORKS_AT]->(c)',
-    terminalSuccess: 'Nodes created: 1  Relationships created: 1  Properties set: 1',
-    terminalError: "SyntaxError: Invalid Cypher — 'INSERT' is not valid here",
+      { text: 'SET user1 "Arun"', correct: true },
+      { text: 'GET user1', correct: false },
+      { text: 'DEL user1', correct: false }
+    ]
   },
   {
-    type: 'Graph',
-    text: 'Delete the KNOWS relationship between Alice and Bob in the Neo4j graph, without deleting either node. Which Cypher command is correct?',
-    data: { kind: 'graph', edges: [
-      { from: 'Alice', rel: 'WORKS_AT', to: 'TechCorp' },
-      { from: 'Bob',   rel: 'WORKS_AT', to: 'TechCorp' },
-      { from: 'Alice', rel: 'KNOWS',    to: 'Bob'      },
-      { from: 'David', rel: 'WORKS_AT', to: 'TechCorp' },
-    ]},
+    type: "Key-Value",
+    question: "Delete a key",
     options: [
-      "MATCH (:Person {name:'Alice'})-[r:KNOWS]->(:Person {name:'Bob'}) DELETE r",
-      "DELETE RELATIONSHIP KNOWS BETWEEN Alice AND Bob",
-      "REMOVE EDGE KNOWS FROM Alice TO Bob",
-      "MATCH (a)-[r:KNOWS]->(b) DETACH DELETE a, b",
-    ],
-    correct: 0,
-    terminalCmd: "MATCH (:Person {name:'Alice'})-[r:KNOWS]->(:Person {name:'Bob'}) DELETE r",
-    terminalSuccess: 'Relationships deleted: 1  (nodes untouched)',
-    terminalError: "SyntaxError: Invalid Cypher near 'DELETE RELATIONSHIP'",
+      { text: 'DEL user1', correct: true },
+      { text: 'SET user1 "Ravi"', correct: false },
+      { text: 'GET user1', correct: false }
+    ]
   },
-
-  // ════════════════ 10 NEW CONCEPT QUESTIONS ════════════════
-
-  // Q9 — NoSQL Concept: CAP Theorem
   {
-    type: 'Document',
-    text: 'According to the CAP Theorem, a distributed NoSQL system can only guarantee TWO of three properties simultaneously. Which set of three properties does the CAP Theorem refer to?',
-    data: { kind: 'kv', pairs: [
-      { key: 'CAP Property 1', val: '???' },
-      { key: 'CAP Property 2', val: '???' },
-      { key: 'CAP Property 3', val: '???' },
-    ]},
+    type: "Column",
+    question: "Insert data into table",
     options: [
-      'Consistency, Availability, Partition Tolerance',
-      'Concurrency, Atomicity, Performance',
-      'Caching, Availability, Persistence',
-      'Consistency, Atomicity, Partition Tolerance',
-    ],
-    correct: 0,
-    terminalCmd: 'explain CAP_THEOREM',
-    terminalSuccess: 'CAP = Consistency + Availability + Partition Tolerance (pick 2)',
-    terminalError: 'ERR: "Concurrency" is not a CAP property',
+      { text: "INSERT INTO users (id,name) VALUES (1,'Ravi');", correct: true },
+      { text: "DELETE FROM users;", correct: false },
+      { text: "UPDATE users SET name='Ravi';", correct: false }
+    ]
   },
-
-  // Q10 — NoSQL Concept: BASE vs ACID
   {
-    type: 'Key-Value',
-    text: 'NoSQL databases often follow the BASE model instead of ACID. What does BASE stand for?',
-    data: { kind: 'kv', pairs: [
-      { key: 'ACID model', val: 'Atomicity, Consistency, Isolation, Durability' },
-      { key: 'BASE model', val: '???' },
-    ]},
+    type: "Column",
+    question: "Update user name",
     options: [
-      'Basically Available, Soft state, Eventual consistency',
-      'Binary Access, Stored Events, Eventual consistency',
-      'Basically Available, Structured data, Exact consistency',
-      'Batch Access, Soft state, Extended consistency',
-    ],
-    correct: 0,
-    terminalCmd: 'explain BASE_MODEL',
-    terminalSuccess: 'BASE: Basically Available, Soft state, Eventual consistency ✔',
-    terminalError: 'ERR: "Binary Access" is not a BASE component',
+      { text: "UPDATE users SET name='Arun' WHERE id=1;", correct: true },
+      { text: "INSERT INTO users VALUES ('Arun');", correct: false },
+      { text: "DELETE users WHERE id=1;", correct: false }
+    ]
   },
-
-  // Q11 — NoSQL Concept: Sharding
   {
-    type: 'Column',
-    text: 'A Cassandra cluster is handling millions of rows and performance is degrading. The team decides to distribute data across multiple nodes by splitting it based on a partition key. What is this technique called?',
-    data: { kind: 'table', headers: ['Node', 'Partition Key Range', 'Row Count'], rows: [
-      ['Node-1', '0 – 33%',  '3.2M'],
-      ['Node-2', '34 – 66%', '3.1M'],
-      ['Node-3', '67 – 100%','3.3M'],
-    ]},
+    type: "Graph",
+    question: "Create a node",
     options: [
-      'Replication',
-      'Indexing',
-      'Sharding (Partitioning)',
-      'Caching',
-    ],
-    correct: 2,
-    terminalCmd: 'nodetool status --shard-info',
-    terminalSuccess: 'Sharding active: 3 nodes, partition key = user_id hash',
-    terminalError: 'ERR: "Replication" copies data, does not split it',
+      { text: 'CREATE (u:User {name:"Ravi"})', correct: true },
+      { text: 'DELETE (u)', correct: false },
+      { text: 'SET u.name="Ravi"', correct: false }
+    ]
   },
-
-  // Q12 — NoSQL Concept: Eventual Consistency
   {
-    type: 'Key-Value',
-    text: 'A Redis cluster is set up with replication. A write is made to the primary node. A client immediately reads from a replica node and gets the OLD value, but 200ms later gets the NEW value. Which NoSQL consistency model does this describe?',
-    data: { kind: 'kv', pairs: [
-      { key: 'Primary write', val: '"status" → "active"  (t=0ms)' },
-      { key: 'Replica read',  val: '"status" → "inactive" (t=10ms)' },
-      { key: 'Replica read',  val: '"status" → "active"   (t=210ms)' },
-    ]},
+    type: "Graph",
+    question: "Create relationship between users",
     options: [
-      'Strong Consistency',
-      'Eventual Consistency',
-      'Linearizability',
-      'Strict Serializability',
-    ],
-    correct: 1,
-    terminalCmd: 'GET status  # reading replica after 10ms',
-    terminalSuccess: '"inactive"  ← stale read — eventual consistency in action',
-    terminalError: 'ERR: Strong consistency would never return a stale value',
-  },
-
-  // Q13 — NoSQL Concept: Document vs Relational
-  {
-    type: 'Document',
-    text: 'A developer is migrating from a relational SQL database to MongoDB. In SQL, data is stored in tables with fixed schemas. What is the MongoDB equivalent of a SQL TABLE?',
-    data: { kind: 'json', label: 'MongoDB structure', docs: [
-      { SQL_concept: 'Database', MongoDB_equivalent: 'Database' },
-      { SQL_concept: 'Table',    MongoDB_equivalent: '???' },
-      { SQL_concept: 'Row',      MongoDB_equivalent: 'Document' },
-      { SQL_concept: 'Column',   MongoDB_equivalent: 'Field' },
-    ]},
-    options: [
-      'Collection',
-      'Bucket',
-      'Namespace',
-      'Schema',
-    ],
-    correct: 0,
-    terminalCmd: 'db.getCollectionNames()',
-    terminalSuccess: '[ "users", "products", "orders" ]  ← these are your "tables"',
-    terminalError: 'ERR: "Bucket" is an S3/Couchbase term, not MongoDB',
-  },
-
-  // Q14 — NoSQL Concept: MongoDB Aggregation
-  {
-    type: 'Document',
-    text: 'You want to count how many orders exist per customer in the "orders" collection and sort the result from most to least orders. Which MongoDB aggregation pipeline is correct?',
-    data: { kind: 'json', label: 'orders collection', docs: [
-      { _id: 'o1', customer: 'alice', amount: 120 },
-      { _id: 'o2', customer: 'bob',   amount: 85  },
-      { _id: 'o3', customer: 'alice', amount: 200 },
-    ]},
-    options: [
-      'db.orders.aggregate([{ $group: { _id: "$customer", total: { $sum: 1 } } }, { $sort: { total: -1 } }])',
-      'db.orders.count().groupBy("customer").sort(-1)',
-      'SELECT customer, COUNT(*) FROM orders GROUP BY customer ORDER BY COUNT DESC',
-      'db.orders.find().group({ customer: 1 }).sort({ count: -1 })',
-    ],
-    correct: 0,
-    terminalCmd: 'db.orders.aggregate([{ $group: { _id: "$customer", total: { $sum: 1 } } }, { $sort: { total: -1 } }])',
-    terminalSuccess: '[{ _id: "alice", total: 2 }, { _id: "bob", total: 1 }]',
-    terminalError: 'ERR: SQL syntax is not valid in MongoDB aggregation pipeline',
-  },
-
-  // Q15 — NoSQL Concept: Redis Data Structures
-  {
-    type: 'Key-Value',
-    text: 'You need to store a leaderboard in Redis where player scores are automatically ranked. Which Redis data structure is BEST suited for this use case?',
-    data: { kind: 'kv', pairs: [
-      { key: 'String',   val: 'Simple key → value storage' },
-      { key: 'List',     val: 'Ordered sequence, push/pop' },
-      { key: 'Hash',     val: 'Field → value map (like a dict)' },
-      { key: 'Sorted Set', val: 'Members with scores, auto-ranked' },
-    ]},
-    options: [
-      'String',
-      'List',
-      'Hash',
-      'Sorted Set (ZADD)',
-    ],
-    correct: 3,
-    terminalCmd: 'ZADD leaderboard 9800 "alice"  5400 "bob"  7200 "carol"',
-    terminalSuccess: '(integer) 3  →  ZRANGE leaderboard 0 -1 WITHSCORES returns ranked list',
-    terminalError: 'ERR: List has no automatic ranking by score',
-  },
-
-  // Q16 — NoSQL Concept: Cassandra Partition Key
-  {
-    type: 'Column',
-    text: 'In Cassandra, when creating a table to store sensor readings, which column should be chosen as the PARTITION KEY to ensure readings from the same sensor are stored on the same node?',
-    data: { kind: 'table', headers: ['reading_id', 'sensor_id', 'temperature', 'recorded_at'], rows: [
-      ['r001', 'sensor-A', '22.5°C', '2024-01-01 08:00'],
-      ['r002', 'sensor-A', '23.1°C', '2024-01-01 09:00'],
-      ['r003', 'sensor-B', '19.8°C', '2024-01-01 08:00'],
-    ]},
-    options: [
-      'reading_id  (unique per row)',
-      'sensor_id   (groups related rows together)',
-      'temperature (frequently queried value)',
-      'recorded_at (time-based ordering)',
-    ],
-    correct: 1,
-    terminalCmd: "CREATE TABLE readings (sensor_id TEXT, recorded_at TIMESTAMP, temp FLOAT, PRIMARY KEY (sensor_id, recorded_at))",
-    terminalSuccess: 'Table created. Partition key: sensor_id — all readings per sensor co-located.',
-    terminalError: 'ERR: reading_id as partition key would spread single-sensor data across all nodes',
-  },
-
-  // Q17 — NoSQL Concept: Neo4j MATCH query
-  {
-    type: 'Graph',
-    text: 'In a Neo4j social network graph, you want to find all people that "Alice" FOLLOWS. Which Cypher query correctly retrieves their names?',
-    data: { kind: 'graph', edges: [
-      { from: 'Alice', rel: 'FOLLOWS', to: 'Bob'   },
-      { from: 'Alice', rel: 'FOLLOWS', to: 'Carol'  },
-      { from: 'Bob',   rel: 'FOLLOWS', to: 'David'  },
-    ]},
-    options: [
-      "MATCH (:Person {name:'Alice'})-[:FOLLOWS]->(p) RETURN p.name",
-      "SELECT name FROM persons WHERE follower = 'Alice'",
-      "FIND (Alice)-[FOLLOWS]->(?) RETURN name",
-      "GET FOLLOWS FROM Alice RETURN names",
-    ],
-    correct: 0,
-    terminalCmd: "MATCH (:Person {name:'Alice'})-[:FOLLOWS]->(p) RETURN p.name",
-    terminalSuccess: '╔══════════╗\n║ p.name   ║\n╠══════════╣\n║ "Bob"    ║\n║ "Carol"  ║\n╚══════════╝',
-    terminalError: "SyntaxError: SQL SELECT is not valid Cypher",
-  },
-
-  // Q18 — NoSQL Concept: NoSQL Types Classification
-  {
-    type: 'Document',
-    text: 'A team is building a product recommendation engine that needs to traverse complex relationships between users, products, and categories to find patterns. Which NoSQL database TYPE is the BEST architectural fit?',
-    data: { kind: 'graph', edges: [
-      { from: 'User:Alice',    rel: 'BOUGHT',      to: 'Product:Laptop' },
-      { from: 'Product:Laptop',rel: 'BELONGS_TO',  to: 'Category:Tech'  },
-      { from: 'User:Bob',      rel: 'INTERESTED_IN',to: 'Category:Tech'  },
-    ]},
-    options: [
-      'Key-Value Store (e.g. Redis) — fast lookups',
-      'Document Store (e.g. MongoDB) — flexible schema',
-      'Column Store (e.g. Cassandra) — time-series writes',
-      'Graph Database (e.g. Neo4j) — relationship traversal',
-    ],
-    correct: 3,
-    terminalCmd: 'MATCH (u:User)-[:BOUGHT]->(:Product)-[:BELONGS_TO]->(c:Category)<-[:INTERESTED_IN]-(rec:User) RETURN rec.name',
-    terminalSuccess: 'Recommended users found via 3-hop graph traversal: ["Bob"]',
-    terminalError: 'ERR: Key-Value stores cannot efficiently traverse multi-hop relationships',
-  },
+      { text: 'CREATE (a)-[:FOLLOWS]->(b)', correct: true },
+      { text: 'DELETE (a)-[:FOLLOWS]->(b)', correct: false },
+      { text: 'SET a=b', correct: false }
+    ]
+  }
 ];
 
 // ════════════════════════════════════════════════════
@@ -728,6 +429,169 @@ function renderData(data) {
 }
 
 // ════════════════════════════════════════════════════
+//  SAMPLE DATA GENERATOR
+// ════════════════════════════════════════════════════
+
+function getSampleDataForType(type) {
+  if (type === 'Document') {
+    return {
+      kind: 'json',
+      label: 'users collection',
+      docs: [
+        { _id: 'u001', name: 'Alice' },
+        { _id: 'u002', name: 'Bob' },
+        { _id: 'u003', name: 'Carol' }
+      ]
+    };
+  } else if (type === 'Key-Value') {
+    return {
+      kind: 'kv',
+      pairs: [
+        { key: 'user1', val: 'Ravi' },
+        { key: 'user2', val: 'Bob' },
+        { key: 'user3', val: 'Carol' }
+      ]
+    };
+  } else if (type === 'Column') {
+    return {
+      kind: 'table',
+      headers: ['id', 'name', 'role'],
+      rows: [
+        [1, 'Alice', 'Admin'],
+        [2, 'Bob', 'User'],
+        [3, 'Carol', 'User']
+      ]
+    };
+  } else if (type === 'Graph') {
+    return {
+      kind: 'graph',
+      edges: [
+        { from: 'Alice', rel: 'KNOWS', to: 'Bob' },
+        { from: 'Bob', rel: 'KNOWS', to: 'Carol' },
+        { from: 'Alice', rel: 'FOLLOWS', to: 'Carol' }
+      ]
+    };
+  }
+  return { kind: 'json', label: 'data', docs: [] };
+}
+
+// ════════════════════════════════════════════════════
+//  OUTPUT DATA GENERATOR (Results after command)
+// ════════════════════════════════════════════════════
+
+function getOutputDataForQuestion(question) {
+  const q = question.question.toLowerCase();
+  const type = question.type;
+
+  if (type === 'Document') {
+    if (q.includes('insert')) {
+      return {
+        kind: 'json',
+        label: 'users collection (after INSERT)',
+        docs: [
+          { _id: 'u001', name: 'Alice' },
+          { _id: 'u002', name: 'Bob' },
+          { _id: 'u003', name: 'Carol' },
+          { _id: 'u004', name: 'Ravi' }
+        ]
+      };
+    } else if (q.includes('update') || q.includes('age')) {
+      return {
+        kind: 'json',
+        label: 'users collection (after UPDATE)',
+        docs: [
+          { _id: 'u001', name: 'Ravi', age: 22 },
+          { _id: 'u002', name: 'Bob', age: 25 },
+          { _id: 'u003', name: 'Carol', age: 28 }
+        ]
+      };
+    } else if (q.includes('delete')) {
+      return {
+        kind: 'json',
+        label: 'users collection (after DELETE)',
+        docs: [
+          { _id: 'u001', name: 'Alice' },
+          { _id: 'u002', name: 'Bob' }
+        ]
+      };
+    }
+  } else if (type === 'Key-Value') {
+    if (q.includes('add') || q.includes('key-value')) {
+      return {
+        kind: 'kv',
+        pairs: [
+          { key: 'user1', val: 'Ravi' },
+          { key: 'user2', val: 'Bob' },
+          { key: 'user3', val: 'Carol' }
+        ]
+      };
+    } else if (q.includes('update')) {
+      return {
+        kind: 'kv',
+        pairs: [
+          { key: 'user1', val: 'Arun' },
+          { key: 'user2', val: 'Bob' },
+          { key: 'user3', val: 'Carol' }
+        ]
+      };
+    } else if (q.includes('delete')) {
+      return {
+        kind: 'kv',
+        pairs: [
+          { key: 'user2', val: 'Bob' },
+          { key: 'user3', val: 'Carol' }
+        ]
+      };
+    }
+  } else if (type === 'Column') {
+    if (q.includes('insert')) {
+      return {
+        kind: 'table',
+        headers: ['id', 'name', 'role'],
+        rows: [
+          [1, 'Ravi', 'User'],
+          [2, 'Alice', 'Admin'],
+          [3, 'Bob', 'User'],
+          [4, 'Carol', 'User']
+        ]
+      };
+    } else if (q.includes('update')) {
+      return {
+        kind: 'table',
+        headers: ['id', 'name', 'role'],
+        rows: [
+          [1, 'Arun', 'User'],
+          [2, 'Alice', 'Admin'],
+          [3, 'Bob', 'User']
+        ]
+      };
+    }
+  } else if (type === 'Graph') {
+    if (q.includes('node')) {
+      return {
+        kind: 'graph',
+        edges: [
+          { from: 'Alice', rel: 'KNOWS', to: 'Bob' },
+          { from: 'Bob', rel: 'KNOWS', to: 'Carol' },
+          { from: 'Ravi', rel: 'KNOWS', to: 'Alice' }
+        ]
+      };
+    } else if (q.includes('relationship')) {
+      return {
+        kind: 'graph',
+        edges: [
+          { from: 'a', rel: 'FOLLOWS', to: 'b' },
+          { from: 'Alice', rel: 'KNOWS', to: 'Bob' },
+          { from: 'Bob', rel: 'KNOWS', to: 'Carol' }
+        ]
+      };
+    }
+  }
+
+  return getSampleDataForType(type);
+}
+
+// ════════════════════════════════════════════════════
 //  QUIZ SCREEN
 // ════════════════════════════════════════════════════
 
@@ -746,10 +610,11 @@ function loadQuiz() {
   dom.dbType.textContent = q.type;
 
   // Question
-  dom.questionText.textContent = q.text;
+  dom.questionText.textContent = q.question;
 
-  // Data
-  renderData(q.data);
+  // Data based on question type
+  const sampleData = getSampleDataForType(q.type);
+  renderData(sampleData);
 
   // Options
   dom.optionsGrid.innerHTML = '';
@@ -758,7 +623,7 @@ function loadQuiz() {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
     btn.dataset.index = i;
-    btn.innerHTML = `<span class="option-label">${labels[i]}</span><span>${opt}</span>`;
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span><span>${opt.text}</span>`;
     btn.addEventListener('click', () => handleOptionClick(i));
     dom.optionsGrid.appendChild(btn);
   });
@@ -787,17 +652,24 @@ function selectAnswer(chosenIdx) {
   clearTimer();
 
   const q = state.currentQuestion;
-  const correct = chosenIdx === q.correct;
+  const correctIdx = q.options.findIndex(opt => opt.correct === true);
+  const correct = chosenIdx === correctIdx;
 
   // Disable all buttons, highlight
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.classList.add('correct');
+    if (i === correctIdx) btn.classList.add('correct');
     else if (i === chosenIdx && !correct) btn.classList.add('wrong');
   });
 
   // Terminal output
   typeTerminal(q, chosenIdx, correct);
+
+  // Show output data (always show output after answering)
+  setTimeout(() => {
+    const outputData = getOutputDataForQuestion(q);
+    renderData(outputData);
+  }, 600);
 
   // Result badge
   dom.resultBadge.className = `result-badge ${correct ? 'correct' : 'wrong'}`;
@@ -826,11 +698,11 @@ function typeTerminal(q, chosenIdx, correct) {
   const body = dom.terminalBody;
   body.innerHTML = '';
 
-  const cmdText = q.options[chosenIdx];
-  const result  = correct ? `✔ ${q.terminalSuccess}` : `✖ ${q.terminalError}`;
-  const cls     = correct ? 'success' : 'error';
-
-  // Line 1: prompt
+  const chosenCmd = q.options[chosenIdx].text;
+  const correctIdx = q.options.findIndex(opt => opt.correct === true);
+  const correctCmd = q.options[correctIdx].text;
+  
+  // Line 1: User's command
   const promptLine = document.createElement('div');
   promptLine.className = 'terminal-line cmd';
   promptLine.innerHTML = `<span class="prompt">$</span><span id="typeTarget"></span><span class="cursor" id="typeCursor"></span>`;
@@ -840,20 +712,30 @@ function typeTerminal(q, chosenIdx, correct) {
   const target = document.getElementById('typeTarget');
 
   function typeChar() {
-    if (i < cmdText.length) {
-      target.textContent += cmdText[i++];
+    if (i < chosenCmd.length) {
+      target.textContent += chosenCmd[i++];
       setTimeout(typeChar, 18 + Math.random() * 12);
     } else {
       // Remove cursor, add result
       document.getElementById('typeCursor')?.remove();
       setTimeout(() => {
+        // Show result
         const resultLine = document.createElement('div');
-        resultLine.className = `terminal-line ${cls}`;
-        resultLine.innerHTML = `<span>${result}</span>`;
+        resultLine.className = `terminal-line ${correct ? 'success' : 'error'}`;
+        const resultMsg = correct 
+          ? '✔ Command executed successfully!'
+          : '✖ Error: Invalid command syntax';
+        resultLine.innerHTML = `<span>${resultMsg}</span>`;
         body.appendChild(resultLine);
 
-        if (correct) {
-          // Also show "canonical" command if different
+        // If wrong, show the correct answer
+        if (!correct) {
+          setTimeout(() => {
+            const correctLine = document.createElement('div');
+            correctLine.className = 'terminal-line dim';
+            correctLine.innerHTML = `<span class="prompt">→</span> <span style="color:#10b981">Correct: ${correctCmd}</span>`;
+            body.appendChild(correctLine);
+          }, 300);
         }
       }, 400);
     }
@@ -894,10 +776,11 @@ function clearTimer() {
 function timeUp() {
   state.answered = true;
   const q = state.currentQuestion;
+  const correctIdx = q.options.findIndex(opt => opt.correct === true);
 
   document.querySelectorAll('.option-btn').forEach((btn, i) => {
     btn.disabled = true;
-    if (i === q.correct) btn.classList.add('correct');
+    if (i === correctIdx) btn.classList.add('correct');
   });
 
   dom.terminalBody.innerHTML = `
